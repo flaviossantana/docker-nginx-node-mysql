@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+    nodeserver:
+        build:
+            context: ./app
+            dockerfile: Dockerfile
+        container_name: node-app
+        tty: true
+        ports:
+            - "3000:3000"
+        networks: 
+            - local.app
+
+    nginx:        
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile
+        container_name: node-nginx
+        restart: always        
+        ports:
+            - "8080:80"
+        networks: 
+            - local.app
+
+networks: 
+    local.app:
+        driver: bridge
