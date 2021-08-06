@@ -1,14 +1,28 @@
 version: "3"
 
 services:
+
     nodeserver:
         build:
             context: ./app
             dockerfile: Dockerfile
         container_name: node-app
+        entrypoint: dockerize -wait tcp://db-app:3306 -timeout 120s node index.js
         tty: true
         ports:
             - "3000:3000"
+        networks: 
+            - local.app
+
+    database:
+        image: mysql:5.7
+        command: --innodb-use-native-aio=0
+        container_name: db-app
+        restart: always
+        tty: true
+        environment: 
+            - MYSQL_DATABASE=database-app
+            - MYSQL_ROOT_PASSWORD=root
         networks: 
             - local.app
 
