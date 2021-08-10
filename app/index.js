@@ -1,7 +1,6 @@
 const express = require('express')
 const mysql = require('mysql')
 const fake = require('faker');
-
 const app = express()
 const port = 3000
 
@@ -25,9 +24,9 @@ conn.query(
 conn.end()
 
 const selectAllPeople = `
-    SELECT * 
-      FROM PEOPLE
-     ORDER BY NAME ASC
+    SELECT PPL.* 
+      FROM PEOPLE PPL
+     ORDER BY PPL.NAME ASC
 `
 
 function insertPeople(name) {
