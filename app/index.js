@@ -5,23 +5,6 @@ const fake = require('faker');
 const app = express()
 const port = 3000
 
-const criaTablePeople = `
-    create table if not exists people (
-        id int not null auto_increment,
-        name varchar(1000),
-        primary key(id)
-    )
-`
-const selectPeople = `
-    select * from people
-    order by id desc
-    limit 30
-`
-
-function insertPeople(name) {
-    return `insert into people(name) values ('${name}')`
-}
-
 const config = {
     host: 'db-app',
     user: 'root',
@@ -30,24 +13,46 @@ const config = {
 }
 
 const conn = mysql.createConnection(config)
-conn.query(criaTablePeople)
+conn.query(
+    `
+    CREATE TABLE IF NOT EXISTS PEOPLE (
+        ID INT NOT NULL AUTO_INCREMENT,
+        NAME VARCHAR(100),
+        PRIMARY KEY(ID)
+    )
+    `
+)
 conn.end()
 
-app.get('/', (req,res) => {
+const selectAllPeople = `
+    SELECT * 
+      FROM PEOPLE
+     ORDER BY NAME ASC
+`
 
-    let retorno = '';
+function insertPeople(name) {
+    return `INSERT INTO PEOPLE(NAME) VALUES ('${name}')`
+}
+
+app.get('/', (req, res) => {
+
+    let tableDataPeople = '';
 
     const conn = mysql.createConnection(config)
     conn.query(insertPeople(fake.name.findName()))
 
-    conn.query(selectPeople, function (err, result, fields) {
-        if (err) throw err;
+    conn.query(selectAllPeople, function (err, result, fields) {
+
+        if (err) {
+            throw err;
+        }
+
         if (result) {
-            result.forEach(p => {
-                retorno += 
+            result.forEach(people => {
+                tableDataPeople +=
                     `<tr>
-                        <td>${p.id}</td>
-                        <td>${p.name}</td>
+                        <td>${people.ID}</td>
+                        <td>${people.NAME}</td>
                     </tr>`
             });
         }
@@ -57,17 +62,17 @@ app.get('/', (req,res) => {
             <table>
                 <tr>
                     <th>ID</th>
-                    <th>Nome</th>
+                    <th>NAME</th>
                 </tr>
-                ${retorno}
+                ${tableDataPeople}
             </table>`
         );
-        
+
     })
     conn.end()
-    
+
 })
 
-app.listen(port, ()=> {
-    console.log('Rodando na porta ' + port);
+app.listen(port, () => {
+    console.log('Server Running on Port: ' + port);
 })

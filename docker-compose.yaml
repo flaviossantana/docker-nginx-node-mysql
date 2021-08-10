@@ -30,7 +30,7 @@ services:
         build:
             context: ./nginx
             dockerfile: Dockerfile
-        container_name: node-nginx
+        container_name: nginx-app
         restart: always        
         ports:
             - "8080:80"
